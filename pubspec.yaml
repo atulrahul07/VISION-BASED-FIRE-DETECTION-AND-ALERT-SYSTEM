@@ -1,0 +1,27 @@
+dependencies:
+  http: latest_version
+  firebase_core: latest_version
+  firebase_messaging: latest_version
+  image_picker: latest_version
+  geolocator: latest_version
+
+
+final picker = ImagePicker();
+final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+
+Future<void> sendImage(File image, double latitude, double longitude) async {
+  var request = http.MultipartRequest("POST", Uri.parse("http://your_flask_server/detect"));
+  request.files.add(await http.MultipartFile.fromPath('file', image.path));
+  request.fields['latitude'] = latitude.toString();
+  request.fields['longitude'] = longitude.toString();
+
+  var response = await request.send();
+  if (response.statusCode == 200) {
+    print("Fire detection response received");
+  }
+}
+
+
+Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+print(position.latitude, position.longitude);
